@@ -65,6 +65,7 @@ export default {
             this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
         },
         handleChange(event) {
+            if (!this.collectionData) return;
             const value = event.target.value.toLowerCase();
             const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
             if (match) this.updateVariableValue(match[this.content.displayBy]);
