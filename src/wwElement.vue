@@ -48,9 +48,11 @@ export default {
     watch: {
         'content.collection'(collectionId) {
             if (!collectionId) return;
-            this.collectionData = wwLib.wwCollection.getCollection(collectionId).data;
-            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
+            this.getCollection(collectionId);
         },
+    },
+    mounted() {
+        if (this.content.collection) this.getCollection(this.content.collection);
     },
     methods: {
         getLabel(item) {
@@ -58,10 +60,23 @@ export default {
             if (item[this.content.displayBy]) return item[this.content.displayBy];
             return '';
         },
+        getCollection(collectionId) {
+            this.collectionData = wwLib.wwCollection.getCollection(collectionId).data;
+            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
+        },
         handleChange(event) {
             const value = event.target.value.toLowerCase();
             const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
-            if (match) this.$emit('trigger-event', { name: 'change', event: { value: match } });
+            if (match) this.updateVariableValue(match[this.content.displayBy]);
+        },
+        getVariableValue() {
+            if (!this.content.variable) return;
+            return wwLib.wwVariable.getValue(this.content.variable);
+        },
+        updateVariableValue(value) {
+            if (!this.content.variable) return;
+            wwLib.wwVariable.updateValue(this.content.variable, value);
+            this.$emit('trigger-event', { name: 'change', event: { value: value } });
         },
     },
 };

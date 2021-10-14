@@ -68,6 +68,18 @@ export default {
             defaultValue: 'none',
             section: 'settings',
         },
+        variable: {
+            label: {
+                en: 'Associated variable',
+            },
+            type: 'Variable',
+            options: {
+                type: 'String',
+            },
+            section: 'settings',
+            bindable: true,
+            defaultValue: null,
+        },
         itemsProperties: {
             hidden: true,
             defaultValue: [],
