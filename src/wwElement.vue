@@ -22,7 +22,7 @@ export default {
         /* wwEditor:end */
         content: { type: Object, required: true },
     },
-    emits: ['update:content'],
+    emits: ['update:content', 'trigger-event'],
     data() {
         return {
             collectionData: null,
