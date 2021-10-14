@@ -1,8 +1,8 @@
 <template>
     <div class="ww-webapp-autocomplete" :styles="cssVariables">
         <input
-            list="autocomplete-list"
             id="autocomplete-choice"
+            list="autocomplete-list"
             name="autocomplete-choice"
             :placeholder="wwLang.getText(content.placeholder)"
             @input="handleChange"
@@ -29,13 +29,6 @@ export default {
             inputValue: '',
         };
     },
-    watch: {
-        'content.collection'(collectionId) {
-            if (!collectionId) return;
-            this.collectionData = wwLib.wwCollectionHelper.getCollection(collectionId).data;
-            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
-        },
-    },
     computed: {
         isEditing() {
             /* wwEditor:start */
@@ -50,6 +43,13 @@ export default {
                 '--input-fontFamily': this.content.fontFamily,
                 '--input-fontSize': this.content.fontSize,
             };
+        },
+    },
+    watch: {
+        'content.collection'(collectionId) {
+            if (!collectionId) return;
+            this.collectionData = wwLib.wwCollectionHelper.getCollection(collectionId).data;
+            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
         },
     },
     methods: {
