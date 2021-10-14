@@ -1,22 +1,16 @@
 <template>
-    <div class="ww-webapp-search" :style="cssVariables" :class="{ editing: isEditing, selected: isSelected }">
-        <div class="input-container">
-            <wwElement
-                ref="searchInput"
-                class="textInput"
-                v-bind="content.textInput"
-                @element-event="handleInputChange"
-            ></wwElement>
-        </div>
-        <div v-if="content.submitEvent === 'button'" class="button-container">
-            <wwElement class="submitButton" v-bind="content.submitButton" @click="handleClick"></wwElement>
-        </div>
+    <div class="ww-webapp-autocomplete" :styles="cssVariables">
+        <input
+            list="autocomplete-list"
+            id="autocomplete-choice"
+            name="autocomplete-choice"
+            :placeholder="wwLang.getText(content.placeholder)"
+            @input="handleChange"
+        />
 
-        <!-- wwEditor:start -->
-        <div class="ww-webapp-search__menu">
-            <wwEditorIcon small name="fontawesome/solid/search" />
-        </div>
-        <!-- wwEditor:end -->
+        <datalist id="autocomplete-list">
+            <option v-for="(item, index) in collectionData" :key="index" :value="getLabel(item)"></option>
+        </datalist>
     </div>
 </template>
 
@@ -28,11 +22,19 @@ export default {
         /* wwEditor:end */
         content: { type: Object, required: true },
     },
-    emits: ['update:content', 'trigger-event'],
+    emits: ['update:content'],
     data() {
         return {
-            debounce: null,
+            collectionData: null,
+            inputValue: '',
         };
+    },
+    watch: {
+        'content.collection'(collectionId) {
+            if (!collectionId) return;
+            this.collectionData = wwLib.wwCollectionHelper.getCollection(collectionId).data;
+            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
+        },
     },
     computed: {
         isEditing() {
@@ -42,150 +44,46 @@ export default {
             // eslint-disable-next-line no-unreachable
             return false;
         },
-        isSelected() {
-            /* wwEditor:start */
-            return this.wwEditorState.isSelected;
-            /* wwEditor:end */
-            // eslint-disable-next-line no-unreachable
-            return false;
-        },
         cssVariables() {
-            let flexDirection = 'row';
-            if (this.content.buttonPosition === 'left' || this.content.buttonPosition === 'right') {
-                if (this.content.buttonPosition === 'left') flexDirection = 'row-reverse';
-                else flexDirection = 'row';
-            } else {
-                if (this.content.buttonPosition === 'top') flexDirection = 'column-reverse';
-                else flexDirection = 'column';
-            }
-
-            const buttonWidthValue = 100 - wwLib.wwUtils.getLengthUnit(this.content.inputWidth)[0];
-            const buttonWidth =
-                this.content.buttonPosition === 'top' || this.content.buttonPosition === 'bottom'
-                    ? '100%'
-                    : buttonWidthValue.toString() + '%';
-
             return {
-                '--container-direction': flexDirection,
-                '--input-width': this.content.inputWidth,
-                '--button-width': buttonWidth,
+                '--input-color': this.content.color,
+                '--input-fontFamily': this.content.fontFamily,
+                '--input-fontSize': this.content.fontSize,
             };
         },
     },
     methods: {
-        handleInputChange(event) {
-            if (this.content.submitEvent !== 'debounce') return;
-
-            clearTimeout(this.debounce);
-            this.debounce = setTimeout(() => {
-                this.updateVariableValue(event.target.value);
-            }, wwLib.wwUtils.getLengthUnit(this.content.debounceDelay));
+        getLabel(item) {
+            if (this.content.displayBy === 'none') return '';
+            if (item[this.content.displayBy]) return item[this.content.displayBy];
+            return '';
         },
-        handleClick() {
-            const value = this.$refs.searchInput.value;
-            this.updateVariableValue(value);
-        },
-        getVariableValue() {
-            if (!this.content.variable) return;
-            return wwLib.wwVariable.getValue(this.content.variable);
-        },
-        updateVariableValue(value) {
-            if (!this.content.variable) return;
-            wwLib.wwVariable.updateValue(this.content.variable, value);
-            // set name
-            const eventName = this.content.submitEvent === 'debounce' ? 'change' : 'submit';
-            this.$emit('trigger-event', { name: eventName, event: { value } });
+        handleChange(event) {
+            const value = event.target.value.toLowerCase();
+            const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
+            if (match) this.$emit('trigger-event', { name: 'change', event: { value: match } });
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-:root {
-    --container-direction: row;
-}
-.ww-webapp-search {
-    width: 100%;
-    display: flex;
-    flex-direction: var(--container-direction);
-    align-items: center;
+.ww-webapp-autocomplete {
+    #autocomplete-choice {
+        outline: none;
+        width: inherit;
+        height: inherit;
+        border: none;
+        background-color: inherit;
+        font-family: var(--input-fontFamily);
+        color: var(--input-color);
+        font-size: var(--input-fontSize);
 
-    .input-container {
-        width: var(--input-width);
-
-        .text-input {
-            width: 100%;
-        }
-    }
-
-    .button-container {
-        width: var(--button-width);
-
-        .submitButton {
-            width: 100%;
-        }
-    }
-
-    /* wwEditor:start */
-    &__status {
-        position: absolute;
-        top: -1px;
-        color: var(--ww-color-white);
-        padding: var(--ww-spacing-00) var(--ww-spacing-01);
-        border-radius: var(--ww-spacing-00);
-        background-color: var(--ww-color-blue-500);
-        z-index: 10;
-        opacity: 0;
-        pointer-events: none;
-        right: -1px;
-    }
-    &.selected {
-        > .ww-webapp-search__status {
-            opacity: 1;
-            pointer-events: all;
-        }
-    }
-    &.editing:hover {
-        & > .border {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 1px solid var(--ww-editor-color);
+        /* wwEditor:start */
+        &.editing {
             pointer-events: none;
-            z-index: 10;
         }
-        > .ww-webapp-search__menu {
-            opacity: 1;
-            pointer-events: all;
-        }
+        /* wwEditor:end */
     }
-    &__menu {
-        display: flex;
-        position: absolute;
-        top: 0px;
-        left: 5px;
-        transform: translate(-50%, -50%);
-        border-radius: 100%;
-        padding: var(--ww-spacing-01);
-        transition: opacity 0.2s ease;
-        z-index: 101;
-        cursor: pointer;
-        background-color: var(--ww-color-blue-500);
-        color: var(--ww-color-white);
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        pointer-events: none;
-        &:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(45deg);
-        }
-    }
-    /* wwEditor:end */
 }
 </style>

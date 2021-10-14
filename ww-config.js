@@ -1,102 +1,76 @@
 export default {
     editor: {
         label: {
-            en: 'Search bar',
-            fr: 'Search bar',
+            en: 'Autocomplete select',
+            fr: 'Autocomplete select',
         },
         icon: 'fontawesome/solid/search',
     },
-    triggerEvents: [
-        { name: 'submit', label: { en: 'On submit' }, event: { value: '' } },
-        { name: 'change', label: { en: 'On change' }, event: { value: '' } },
-    ],
+    triggerEvents: [{ name: 'change', label: { en: 'On change' }, event: { value: '' } }],
     properties: {
-        buttonPosition: {
-            hidden: content => content.submitEvent !== 'button',
-            label: {
-                en: 'Button position',
-                fr: 'Position du bouton',
-            },
-            type: 'TextSelect',
+        placeholder: {
+            label: { en: 'Placeholder', fr: 'Placeholder' },
+            type: 'Text',
+            options: { placeholder: 'Type text' },
+            multiLang: true,
+            section: 'settings',
+        },
+        color: {
+            label: { en: 'Color', fr: 'Couleur' },
+            type: 'Color',
+            defaultValue: 'black',
+        },
+        fontFamily: {
+            type: 'FontFamily',
+            label: { en: 'Font family', fr: 'Font' },
+            defaultValue: '',
+        },
+        fontSize: {
+            type: 'Length',
+            label: { en: 'Font size', fr: 'Taille du texte' },
             options: {
-                options: [
-                    { value: 'right', label: { en: 'Right' } },
-                    { value: 'left', label: { en: 'Left' } },
-                    { value: 'top', label: { en: 'Top' } },
-                    { value: 'bottom', label: { en: 'Bottom' } },
+                unitChoices: [
+                    { value: 'px', label: 'px', min: 10, max: 50 },
+                    { value: 'em', label: 'em', min: 1, max: 50 },
+                    { value: 'rem', label: 'rem', min: 1, max: 50 },
                 ],
             },
-            responsive: true,
-            defaultValue: 'right',
+            defaultValue: '15px',
         },
-        inputWidth: {
-            type: 'Length',
+        collection: {
             label: {
-                en: 'Input width',
-                fr: 'Input width',
+                en: 'Select from (unpaginated collection)',
             },
+            type: 'Collection',
             options: {
-                unitChoices: [{ value: '%', label: '%', min: 0, max: 100 }],
-            },
-            defaultValue: '50%',
-        },
-        submitEvent: {
-            label: {
-                en: 'Submit event',
-                fr: 'Evenement de soumission',
-            },
-            type: 'TextSelect',
-            options: {
-                options: [
-                    { value: 'debounce', label: { en: 'On change' } },
-                    { value: 'button', label: { en: 'Button' } },
-                ],
-            },
-            section: 'settings',
-            responsive: true,
-            bindable: true,
-            defaultValue: 'debounce',
-        },
-        debounceDelay: {
-            type: 'Length',
-            label: {
-                en: 'Delay',
-                fr: 'Délai',
-            },
-            options: {
-                unitChoices: [{ value: 'ms', label: 'ms', min: 1, max: 5000 }],
-            },
-            section: 'settings',
-            defaultValue: '500ms',
-        },
-        enterKey: {
-            type: 'OnOff',
-            label: {
-                en: 'Submitting by pressing enter',
-                fr: 'Submitting by pressing enter',
-            },
-            section: 'settings',
-            defaultValue: true,
-        },
-        variable: {
-            label: {
-                en: 'Associated variable',
-            },
-            type: 'Variable',
-            options: {
-                type: 'String',
+                paginated: false,
             },
             section: 'settings',
             bindable: true,
             defaultValue: null,
         },
-        submitButton: {
-            hidden: true,
-            defaultValue: { isWwObject: true, type: 'ww-button' },
+        displayBy: {
+            hidden: content => content.collection === null,
+            label: {
+                en: 'Display by',
+                fr: 'Display by',
+            },
+            type: 'TextSelect',
+            options: content => {
+                const options = content.itemsProperties.map(item => {
+                    return { value: item, label: { en: item } };
+                });
+
+                return {
+                    options: [{ value: 'none', label: { en: 'Select a property' } }, ...options],
+                };
+            },
+            defaultValue: 'none',
+            section: 'settings',
         },
-        textInput: {
+        itemsProperties: {
             hidden: true,
-            defaultValue: { isWwObject: true, type: '9c263ffe-7da7-45e7-832c-543aef56faef' },
+            defaultValue: [],
         },
     },
 };

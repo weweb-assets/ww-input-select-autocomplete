@@ -1,7 +1,7 @@
 {
-    "name": "ww-iframe",
+    "name": "ww-webapp-autocomplete",
     "repository": {
-        "url": "https://github.com/weweb-assets/ww-iframe"
+        "url": "https://github.com/weweb-assets/ww-webapp-autocomplete"
     },
     "version": "3.1.0",
     "license": "MIT",
