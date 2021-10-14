@@ -68,6 +68,7 @@ export default {
             const value = event.target.value.toLowerCase();
             const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
             if (match) this.updateVariableValue(match[this.content.displayBy]);
+            else if (value === '') this.updateVariableValue('');
         },
         getVariableValue() {
             if (!this.content.variable) return;
