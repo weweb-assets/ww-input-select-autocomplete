@@ -48,7 +48,7 @@ export default {
     watch: {
         'content.collection'(collectionId) {
             if (!collectionId) return;
-            this.collectionData = wwLib.wwCollectionHelper.getCollection(collectionId).data;
+            this.collectionData = wwLib.wwCollection.getCollection(collectionId).data;
             this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
         },
     },
