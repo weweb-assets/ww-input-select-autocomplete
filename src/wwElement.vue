@@ -64,8 +64,13 @@ export default {
             return '';
         },
         async getCollection(collectionId) {
-            this.collectionData = await wwLib.wwCollection.getCollection(collectionId).data;
-            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
+            const data = await wwLib.wwCollection.getCollection(collectionId).data;
+            this.collectionData = data;
+            if (data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
+            else
+                setTimeout(async () => {
+                    await this.getCollection(this.content.collection);
+                }, 500);
         },
         handleChange(event) {
             if (!this.collectionData) return;
