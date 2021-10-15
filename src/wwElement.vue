@@ -51,7 +51,6 @@ export default {
             this.getCollection(collectionId);
         },
         collectionData(data) {
-            console.log(data);
             if (data && data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
         },
     },
@@ -67,6 +66,7 @@ export default {
         async getCollection(collectionId) {
             const data = await wwLib.wwCollection.getCollection(collectionId).data;
             this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
+            console.log('updated: ', data);
         },
         handleChange(event) {
             if (!this.collectionData) return;
