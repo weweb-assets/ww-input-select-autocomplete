@@ -84,5 +84,9 @@ export default {
             hidden: true,
             defaultValue: [],
         },
+        collectionData: {
+            hidden: true,
+            defaultValue: [],
+        },
     },
 };

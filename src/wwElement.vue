@@ -25,7 +25,6 @@ export default {
     emits: ['update:content', 'trigger-event'],
     data() {
         return {
-            collectionData: null,
             inputValue: '',
         };
     },
@@ -50,7 +49,7 @@ export default {
             if (!collectionId) return;
             this.getCollection(collectionId);
         },
-        collectionData(data) {
+        'content.collectionData'(data) {
             if (data && data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
         },
     },
@@ -64,12 +63,15 @@ export default {
             return '';
         },
         async getCollection(collectionId) {
-            this.collectionData = await wwLib.wwCollection.getCollection(collectionId).data;
+            const data = await wwLib.wwCollection.getCollection(collectionId).data;
+            this.$emit('update:content', { collectionData: data });
         },
         handleChange(event) {
-            if (!this.collectionData) return;
+            if (!this.content.collectionData) return;
             const value = event.target.value.toLowerCase();
-            const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
+            const match = this.content.collectionData.filter(
+                item => item[this.content.displayBy].toLowerCase() === value
+            )[0];
             if (match) this.updateVariableValue(match[this.content.displayBy]);
             else if (value === '') this.updateVariableValue('');
         },
