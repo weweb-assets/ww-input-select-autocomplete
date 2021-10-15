@@ -50,6 +50,9 @@ export default {
             if (!collectionId) return;
             this.getCollection(collectionId);
         },
+        collectionData(data) {
+            if (data && data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
+        },
     },
     mounted() {
         if (this.content.collection) this.getCollection(this.content.collection);
@@ -60,10 +63,8 @@ export default {
             if (item[this.content.displayBy]) return item[this.content.displayBy];
             return '';
         },
-        getCollection(collectionId) {
-            this.collectionData = wwLib.wwCollection.getCollection(collectionId).data;
-            if (this.collectionData && this.collectionData[0])
-                this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
+        async getCollection(collectionId) {
+            this.collectionData = await wwLib.wwCollection.getCollection(collectionId).data;
         },
         handleChange(event) {
             if (!this.collectionData) return;
@@ -71,10 +72,6 @@ export default {
             const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
             if (match) this.updateVariableValue(match[this.content.displayBy]);
             else if (value === '') this.updateVariableValue('');
-        },
-        getVariableValue() {
-            if (!this.content.variable) return;
-            return wwLib.wwVariable.getValue(this.content.variable);
         },
         updateVariableValue(value) {
             if (!this.content.variable) return;
