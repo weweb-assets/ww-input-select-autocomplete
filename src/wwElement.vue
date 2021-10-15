@@ -25,7 +25,7 @@ export default {
     emits: ['update:content', 'trigger-event'],
     data() {
         return {
-            collectionData: null,
+            collectionData: [],
             inputValue: '',
         };
     },
@@ -64,9 +64,8 @@ export default {
             return '';
         },
         async getCollection(collectionId) {
-            const data = await wwLib.wwCollection.getCollection(collectionId).data;
-            this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
-            console.log('updated: ', data);
+            this.collectionData = await wwLib.wwCollection.getCollection(collectionId).data;
+            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
         },
         handleChange(event) {
             if (!this.collectionData) return;
