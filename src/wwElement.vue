@@ -53,8 +53,8 @@ export default {
             if (data && data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
         },
     },
-    mounted() {
-        if (this.content.collection) this.getCollection(this.content.collection);
+    async mounted() {
+        if (this.content.collection) await this.getCollection(this.content.collection);
     },
     methods: {
         getLabel(item) {
