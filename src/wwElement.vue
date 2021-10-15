@@ -25,7 +25,7 @@ export default {
     emits: ['update:content', 'trigger-event'],
     data() {
         return {
-            // collectionData: null,
+            collectionData: null,
             inputValue: '',
         };
     },
