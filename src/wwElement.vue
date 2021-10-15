@@ -27,6 +27,7 @@ export default {
         return {
             collectionData: [],
             inputValue: '',
+            errorCount: 0,
         };
     },
     computed: {
@@ -67,10 +68,13 @@ export default {
             const data = await wwLib.wwCollection.getCollection(collectionId).data;
             this.collectionData = data;
             if (data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
-            else
-                setTimeout(async () => {
-                    await this.getCollection(this.content.collection);
-                }, 500);
+            else {
+                if (this.errorCount < 10)
+                    setTimeout(async () => {
+                        await this.getCollection(this.content.collection);
+                        this.errorCount += 1;
+                    }, 500);
+            }
         },
         handleChange(event) {
             if (!this.collectionData) return;
