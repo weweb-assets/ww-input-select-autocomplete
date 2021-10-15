@@ -62,7 +62,8 @@ export default {
         },
         getCollection(collectionId) {
             this.collectionData = wwLib.wwCollection.getCollection(collectionId).data;
-            this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
+            if (this.collectionData && this.collectionData[0])
+                this.$emit('update:content', { itemsProperties: Object.keys(this.collectionData[0]) });
         },
         handleChange(event) {
             if (!this.collectionData) return;
