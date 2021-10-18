@@ -9,7 +9,7 @@
         />
 
         <datalist id="autocomplete-list">
-            <option v-for="(item, index) in collectionData" :key="index" :value="getLabel(item)"></option>
+            <option v-for="(item, index) in options" :key="index" :value="getLabel(item)"></option>
         </datalist>
     </div>
 </template>
@@ -22,7 +22,7 @@ export default {
         /* wwEditor:end */
         content: { type: Object, required: true },
     },
-    emits: ['update:content', 'trigger-event'],
+    emits: ['update:content:effect', 'trigger-event'],
     data() {
         return {
             collectionData: [],
@@ -45,14 +45,25 @@ export default {
                 '--input-fontSize': this.content.fontSize,
             };
         },
+        options() {
+            // const data = this.content.collectionId
+            //     ? wwLib.wwCollection.getCollection(this.content.collectionId).data
+            //     : [];
+
+            // return data.filter(item => !!item);
+
+            return this.collectionData.filter(item => !!item);
+        },
     },
     watch: {
-        'content.collection'(collectionId) {
-            if (!collectionId) return;
-            this.getCollection(collectionId);
+        'content.collection': {
+            handler: async function (collectionId) {
+                if (!collectionId) return;
+                await this.getCollection(collectionId);
+            },
         },
         collectionData(data) {
-            if (data && data[0]) this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
+            if (data && data[0]) this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
         },
     },
     async mounted() {
@@ -67,7 +78,7 @@ export default {
         async getCollection(collectionId) {
             const data = await wwLib.wwCollection.getCollection(collectionId).data;
             this.collectionData = data;
-            this.$emit('update:content', { itemsProperties: Object.keys(data[0]) });
+            this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
         },
         handleChange(event) {
             if (!this.collectionData) return;
