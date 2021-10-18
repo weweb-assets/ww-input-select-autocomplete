@@ -25,7 +25,6 @@ export default {
     emits: ['update:content:effect', 'trigger-event'],
     data() {
         return {
-            collectionData: [],
             inputValue: '',
             errorCount: 0,
         };
@@ -46,28 +45,14 @@ export default {
             };
         },
         options() {
-            // const data = this.content.collectionId
-            //     ? wwLib.wwCollection.getCollection(this.content.collectionId).data
-            //     : [];
-
-            // return data.filter(item => !!item);
-
-            return this.collectionData.filter(item => !!item);
+            const data = this.content.collection ? wwLib.wwCollection.getCollection(this.content.collection).data : [];
+            return data.filter(item => !!item);
         },
     },
     watch: {
-        'content.collection': {
-            handler: async function (collectionId) {
-                if (!collectionId) return;
-                await this.getCollection(collectionId);
-            },
-        },
-        collectionData(data) {
+        options(data) {
             if (data && data[0]) this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
         },
-    },
-    async mounted() {
-        if (this.content.collection) await this.getCollection(this.content.collection);
     },
     methods: {
         getLabel(item) {
@@ -75,15 +60,10 @@ export default {
             if (item[this.content.displayBy]) return item[this.content.displayBy];
             return '';
         },
-        async getCollection(collectionId) {
-            const data = await wwLib.wwCollection.getCollection(collectionId).data;
-            this.collectionData = data;
-            this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
-        },
         handleChange(event) {
-            if (!this.collectionData) return;
+            if (!this.options) return;
             const value = event.target.value.toLowerCase();
-            const match = this.collectionData.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
+            const match = this.options.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
             if (match) this.updateVariableValue(match[this.content.displayBy]);
             else if (value === '') this.updateVariableValue('');
         },
