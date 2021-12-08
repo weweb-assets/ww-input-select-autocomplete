@@ -24,6 +24,7 @@ export default {
         wwEditorState: { type: Object, required: true },
         /* wwEditor:end */
         content: { type: Object, required: true },
+        uid: { type: String, required: true },
     },
     emits: ['update:content:effect', 'trigger-event'],
     setup(props) {
