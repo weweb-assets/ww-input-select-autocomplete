@@ -2,6 +2,7 @@
     <div class="ww-webapp-autocomplete" :styles="cssVariables">
         <input
             id="autocomplete-choice"
+            ref="input"
             list="autocomplete-list"
             name="autocomplete-choice"
             :placeholder="wwLang.getText(content.placeholder)"
@@ -15,6 +16,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+
 export default {
     props: {
         /* wwEditor:start */
@@ -23,10 +26,15 @@ export default {
         content: { type: Object, required: true },
     },
     emits: ['update:content:effect', 'trigger-event'],
+    setup(props) {
+        const internalVariableId = computed(() => props.content.variable);
+        const variableId = wwLib.wwVariable.useComponentVariable(props.uid, 'value', '', internalVariableId);
+
+        return { variableId };
+    },
     data() {
         return {
-            inputValue: '',
-            errorCount: 0,
+            internalValue: '',
         };
     },
     computed: {
@@ -37,6 +45,17 @@ export default {
             // eslint-disable-next-line no-unreachable
             return false;
         },
+        value: {
+            get() {
+                if (this.variableId) return wwLib.wwVariable.getValue(this.variableId);
+                return this.internalValue || '';
+            },
+            set(value) {
+                this.$emit('trigger-event', { name: 'change', event: { value } });
+                this.internalValue = value;
+                if (this.variableId) wwLib.wwVariable.updateValue(this.variableId, value);
+            },
+        },
         cssVariables() {
             return {
                 '--input-color': this.content.color,
@@ -45,14 +64,33 @@ export default {
             };
         },
         options() {
-            const data = this.content.collection ? wwLib.wwCollection.getCollection(this.content.collection).data : [];
-            return data.filter(item => !!item);
+            let data;
+            if (this.content.collection) {
+                const collection = wwLib.wwCollection.getCollection(this.content.collection);
+                if (collection && collection.data && collection.data.results) {
+                    data = collection.data.results.filter(item => !!item);
+                }
+            } else data = [];
+
+            return data;
         },
     },
     watch: {
         options(data) {
             if (data && data[0]) this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
         },
+        value(value) {
+            this.$refs.input.value = value;
+        },
+        /* wwEditor:start */
+        'content.initialValue'(value) {
+            this.value = value;
+        },
+        /* wwEditor:end */
+    },
+    mounted() {
+        if (this.content.initialValue) this.value = this.content.initialValue;
+        this.$refs.input.value = this.value;
     },
     methods: {
         getLabel(item) {
@@ -64,13 +102,8 @@ export default {
             if (!this.options) return;
             const value = event.target.value.toLowerCase();
             const match = this.options.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
-            if (match) this.updateVariableValue(match[this.content.displayBy]);
-            else if (value === '') this.updateVariableValue('');
-        },
-        updateVariableValue(value) {
-            if (!this.content.variable) return;
-            wwLib.wwVariable.updateValue(this.content.variable, value);
-            this.$emit('trigger-event', { name: 'change', event: { value: value } });
+            if (match) this.value = match[this.content.displayBy];
+            else if (value === '') this.value = '';
         },
     },
 };

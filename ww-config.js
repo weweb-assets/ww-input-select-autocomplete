@@ -50,7 +50,7 @@ export default {
             defaultValue: null,
         },
         displayBy: {
-            hidden: content => content.collection === null,
+            hidden: content => !content.collection,
             label: {
                 en: 'Display by',
                 fr: 'Display by',
@@ -74,11 +74,21 @@ export default {
             },
             type: 'Variable',
             options: {
-                type: 'String',
+                type: ['String', 'Query', 'Number'],
             },
             section: 'settings',
             bindable: true,
             defaultValue: null,
+        },
+        initialValue: {
+            label: {
+                en: 'Initial value',
+            },
+            type: 'Text',
+            section: 'settings',
+            bindable: true,
+            hidden: content => content.variable,
+            defaultValue: '',
         },
         itemsProperties: {
             hidden: true,
