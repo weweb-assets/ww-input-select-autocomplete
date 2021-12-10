@@ -68,7 +68,7 @@ export default {
             defaultValue: 'none',
             section: 'settings',
         },
-        variable: {
+        variableId: {
             label: {
                 en: 'Associated variable',
             },
@@ -77,7 +77,6 @@ export default {
                 type: ['String', 'Query', 'Number'],
             },
             section: 'settings',
-            bindable: true,
             defaultValue: null,
         },
         initialValue: {
@@ -87,7 +86,7 @@ export default {
             type: 'Text',
             section: 'settings',
             bindable: true,
-            hidden: content => content.variable,
+            hidden: content => content.variableId,
             defaultValue: '',
         },
         itemsProperties: {
