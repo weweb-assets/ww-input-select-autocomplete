@@ -63,9 +63,21 @@ export default {
             },
             type: 'TextSelect',
             options: content => {
-                const options = content.itemsProperties.map(item => {
-                    return { value: item, label: { en: item } };
-                });
+                let data = [];
+                const collection = wwLib.wwCollection.getCollection(content.collection);
+                if (collection && collection.data && collection.data.results) {
+                    data = collection.data.results.filter(item => !!item);
+                }
+
+                const options = content.itemsProperties
+                    .map(item => {
+                        return data &&
+                            data[0] &&
+                            (typeof data[0][item] === 'string' || typeof data[0][item] === 'number')
+                            ? { value: item, label: { en: item } }
+                            : null;
+                    })
+                    .filter(item => !!item);
 
                 return {
                     options: [{ value: 'none', label: { en: 'Select a property' } }, ...options],
