@@ -64,9 +64,14 @@ export default {
             type: 'TextSelect',
             options: content => {
                 let data = [];
-                const collection = wwLib.wwCollection.getCollection(content.collection);
-                if (collection && collection.data && collection.data.results) {
-                    data = collection.data.results.filter(item => !!item);
+
+                if (typeof content.collection === 'string') {
+                    const collection = wwLib.wwCollection.getCollection(content.collection);
+                    if (collection && collection.data && collection.data.results) {
+                        data = collection.data.results.filter(item => !!item);
+                    }
+                } else {
+                    data = content.collection;
                 }
 
                 const options = content.itemsProperties
