@@ -98,9 +98,6 @@ export default {
                 }
             }
         },
-        value(value) {
-            this.$refs.input.value = value;
-        },
         /* wwEditor:start */
         'content.initialValue'(value) {
             if (value !== undefined && !this.content.variableId) {
