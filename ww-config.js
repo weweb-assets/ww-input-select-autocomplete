@@ -49,8 +49,14 @@ export default {
             bindable: true,
             defaultValue: null,
         },
+        isObjectsCollection: {
+            type: 'OnOff',
+            editorOnly: true,
+            hidden: true,
+            defaultValue: true,
+        },
         displayBy: {
-            hidden: content => !content.collection,
+            hidden: (content, sidepanelContent) => !content.collection || !sidepanelContent.isObjectsCollection,
             label: {
                 en: 'Display by',
                 fr: 'Display by',
@@ -85,8 +91,8 @@ export default {
             },
             type: 'Text',
             section: 'settings',
-            bindable: true,
             hidden: content => content.variableId,
+            bindable: true,
             defaultValue: '',
         },
         itemsProperties: {

@@ -1,5 +1,6 @@
 <template>
     <div class="ww-webapp-autocomplete" :styles="cssVariables">
+        dev : {{ isObjectsCollection }}
         <input
             id="autocomplete-choice"
             ref="input"
@@ -26,7 +27,7 @@ export default {
         content: { type: Object, required: true },
         uid: { type: String, required: true },
     },
-    emits: ['update:content:effect', 'trigger-event'],
+    emits: ['update:content:effect', 'trigger-event', 'update:sidepanel-content'],
     setup(props) {
         const internalVariableId = computed(() => props.content.variableId);
         const variableId = wwLib.wwVariable.useComponentVariable(props.uid, 'value', '', internalVariableId);
@@ -64,41 +65,66 @@ export default {
                 '--input-fontSize': this.content.fontSize,
             };
         },
-        options() {
-            let data;
-            if (this.content.collection) {
-                const collection = wwLib.wwCollection.getCollection(this.content.collection);
-                if (collection && collection.data && collection.data.results) {
-                    data = collection.data.results.filter(item => !!item);
-                }
-            } else data = [];
+        isCollectionId() {
+            return typeof this.content.collection === 'string';
+        },
+        isObjectsCollection() {
+            if (this.options && this.options[0]) {
+                const itemType = typeof this.options[0];
+                if (itemType === 'object') return true;
+            }
 
-            return data;
+            return false;
+        },
+        options() {
+            if (this.content.collection) {
+                if (this.isCollectionId) {
+                    const collection = wwLib.wwCollection.getCollection(this.content.collection);
+                    if (collection && collection.data && collection.data.results) {
+                        return collection.data.results.filter(item => !!item);
+                    }
+                } else {
+                    return this.content.collection;
+                }
+            }
+
+            return [];
         },
     },
     watch: {
         options(data) {
-            if (data && data[0]) this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
+            if (data && data[0]) {
+                if (this.content.collection) {
+                    this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
+                }
+            }
         },
         value(value) {
             this.$refs.input.value = value;
         },
         /* wwEditor:start */
         'content.initialValue'(value) {
-            if (value && value !== undefined && !this.content.variableId) {
+            if (value !== undefined && !this.content.variableId) {
                 this.value = value;
             }
+        },
+        isObjectsCollection: {
+            handler(value) {
+                this.$emit('update:sidepanel-content', { path: 'isObjectsCollection', value });
+            },
+            imediate: true,
         },
         /* wwEditor:end */
     },
     mounted() {
-        if (this.content.initialValue && this.content.initialValue !== undefined && !this.content.variableId) {
+        if (this.content.initialValue !== undefined && !this.content.variableId) {
             this.value = this.content.initialValue;
         }
         this.$refs.input.value = this.value;
     },
     methods: {
         getLabel(item) {
+            if (!this.isObjectsCollection && !this.isCollectionId) return item;
             if (this.content.displayBy === 'none') return '';
             if (item[this.content.displayBy]) return item[this.content.displayBy];
             return '';
@@ -106,8 +132,15 @@ export default {
         handleChange(event) {
             if (!this.options) return;
             const value = event.target.value.toLowerCase();
-            const match = this.options.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
-            if (match) this.value = match[this.content.displayBy];
+
+            let match;
+            if (this.isObjectsCollection) {
+                match = this.options.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
+            } else {
+                match = this.options.filter(item => item.toLowerCase() === value)[0];
+            }
+
+            if (match) this.value = this.isObjectsCollection ? match[this.content.displayBy] : match;
             else if (value === '') this.value = '';
         },
     },
