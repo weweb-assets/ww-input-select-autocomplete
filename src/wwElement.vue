@@ -1,6 +1,5 @@
 <template>
     <div class="ww-webapp-autocomplete" :styles="cssVariables">
-        dev : {{ isObjectsCollection }}
         <input
             id="autocomplete-choice"
             ref="input"
