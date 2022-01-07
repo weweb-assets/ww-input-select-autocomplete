@@ -30,11 +30,6 @@ export default {
         const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable(props.uid, 'value', '');
         return { variableValue, setValue };
     },
-    data() {
-        return {
-            internalValue: this.variableValue,
-        };
-    },
     computed: {
         isEditing() {
             /* wwEditor:start */
@@ -50,7 +45,6 @@ export default {
             set(value) {
                 if (value !== undefined && value !== this.variableValue) {
                     this.$emit('trigger-event', { name: 'change', event: { value } });
-                    this.internalValue = value;
                     this.setValue(value);
                 }
             },
@@ -110,13 +104,11 @@ export default {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
         'content.value'(value) {
-            if (value !== undefined) {
-                this.value = value;
-                if (!this.options) return;
-                this.$refs.input.value = this.options.find(
-                    item => item.value.toString().toLowerCase() === value.toString().toLowerCase()
-                ).name;
-            }
+            this.value = value;
+            if (!this.options) return;
+            this.$refs.input.value = this.options.find(
+                item => item.value.toString().toLowerCase() === value.toString().toLowerCase()
+            ).name;
         },
         /* wwEditor:end */
     },
