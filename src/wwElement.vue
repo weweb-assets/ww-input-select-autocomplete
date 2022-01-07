@@ -4,20 +4,18 @@
             id="autocomplete-choice"
             ref="input"
             list="autocomplete-list"
-            name="autocomplete-choice"
+            :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
             @input="handleChange"
         />
 
         <datalist id="autocomplete-list">
-            <option v-for="(item, index) in options" :key="index" :value="getLabel(item)"></option>
+            <option v-for="(option, index) in options" :key="index" :value="option.name"></option>
         </datalist>
     </div>
 </template>
 
 <script>
-import { computed } from 'vue';
-
 export default {
     props: {
         /* wwEditor:start */
@@ -25,17 +23,16 @@ export default {
         /* wwEditor:end */
         content: { type: Object, required: true },
         uid: { type: String, required: true },
+        wwElementState: { type: Object, required: true },
     },
     emits: ['update:content:effect', 'trigger-event', 'update:sidepanel-content'],
     setup(props) {
-        const internalVariableId = computed(() => props.content.variableId);
-        const variableId = wwLib.wwVariable.useComponentVariable(props.uid, 'value', '', internalVariableId);
-
-        return { variableId };
+        const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable(props.uid, 'value', '');
+        return { variableValue, setValue };
     },
     data() {
         return {
-            internalValue: '',
+            internalValue: this.variableValue,
         };
     },
     computed: {
@@ -48,13 +45,14 @@ export default {
         },
         value: {
             get() {
-                if (this.variableId) return wwLib.wwVariable.getValue(this.variableId);
-                return this.internalValue || '';
+                return this.variableValue;
             },
             set(value) {
-                this.$emit('trigger-event', { name: 'change', event: { value } });
-                this.internalValue = value;
-                if (this.variableId) wwLib.wwVariable.updateValue(this.variableId, value);
+                if (value !== undefined && value !== this.variableValue) {
+                    this.$emit('trigger-event', { name: 'change', event: { value } });
+                    this.internalValue = value;
+                    this.setValue(value);
+                }
             },
         },
         cssVariables() {
@@ -64,80 +62,74 @@ export default {
                 '--input-fontSize': this.content.fontSize,
             };
         },
-        isCollectionId() {
-            return typeof this.content.collection === 'string';
-        },
-        isObjectsCollection() {
-            if (this.options && this.options[0]) {
-                const itemType = typeof this.options[0];
-                if (itemType === 'object') return true;
-            }
-
-            return false;
-        },
         options() {
-            if (this.content.collection) {
-                if (this.isCollectionId) {
-                    const collection = wwLib.wwCollection.getCollection(this.content.collection);
-                    if (collection && collection.data && collection.data.results) {
-                        return collection.data.results.filter(item => !!item);
-                    }
-                } else {
-                    return this.content.collection;
-                }
+            if (!this.content.options) return;
+            let data = this.content.options;
+            if (data && !Array.isArray(data) && typeof data === 'object') {
+                data = new Array(data);
+            } else if ((data && !Array.isArray(data)) || typeof data !== 'object') {
+                return [];
             }
 
-            return [];
+            return data
+                .filter(item => !!item)
+                .map(item => {
+                    if (typeof item !== 'object') return { name: item, value: item };
+                    return {
+                        name: wwLib.wwLang.getText(item[this.content.displayField || 'name'] || ''),
+                        value: item[this.content.valueField || 'value'],
+                    };
+                });
         },
     },
     watch: {
-        options(data) {
-            if (data && data[0]) {
-                if (this.content.collection) {
-                    this.$emit('update:content:effect', { itemsProperties: Object.keys(data[0]) });
-                }
-            }
-        },
         /* wwEditor:start */
-        'content.initialValue'(value) {
-            if (value !== undefined && !this.content.variableId) {
-                this.value = value;
+        'content.options': {
+            immediate: true,
+            handler(options) {
+                const objectOptions = (options || []).filter(option => option && typeof option === 'object');
+                if (objectOptions[0]) {
+                    this.$emit('update:sidepanel-content', {
+                        path: 'itemsProperties',
+                        value: Object.keys(objectOptions[0]),
+                    });
+                } else {
+                    this.$emit('update:sidepanel-content', { path: 'itemsProperties', value: [] });
+                }
+            },
+        },
+        'wwEditorState.sidepanelContent.itemsProperties'(newProperties, oldProperties) {
+            if (_.isEqual(newProperties, oldProperties)) return;
+            if (this.wwEditorState.boundProps.options && newProperties && newProperties[0]) {
+                this.$emit('update:content:effect', { displayField: newProperties[0], valueField: newProperties[0] });
+            } else {
+                this.$emit('update:content:effect', { displayField: null, valueField: null });
             }
         },
-        isObjectsCollection: {
-            handler(value) {
-                this.$emit('update:sidepanel-content', { path: 'isObjectsCollection', value });
-            },
-            imediate: true,
+        'wwEditorState.boundProps.options'(isBind) {
+            if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
+        },
+        'content.value'(value) {
+            if (value !== undefined) {
+                this.value = value;
+                if (!this.options) return;
+                this.$refs.input.value = this.options.find(
+                    item => item.value.toString().toLowerCase() === value.toString().toLowerCase()
+                ).name;
+            }
         },
         /* wwEditor:end */
     },
-    mounted() {
-        if (this.content.initialValue !== undefined && !this.content.variableId) {
-            this.value = this.content.initialValue;
-        }
-        this.$refs.input.value = this.value;
-    },
     methods: {
-        getLabel(item) {
-            if (!this.isObjectsCollection && !this.isCollectionId) return item;
-            if (this.content.displayBy === 'none') return '';
-            if (item[this.content.displayBy]) return item[this.content.displayBy];
-            return '';
-        },
         handleChange(event) {
             if (!this.options) return;
             const value = event.target.value.toLowerCase();
-
-            let match;
-            if (this.isObjectsCollection) {
-                match = this.options.filter(item => item[this.content.displayBy].toLowerCase() === value)[0];
-            } else {
-                match = this.options.filter(item => item.toLowerCase() === value)[0];
+            if (value === '') {
+                this.value = '';
+                return;
             }
 
-            if (match) this.value = this.isObjectsCollection ? match[this.content.displayBy] : match;
-            else if (value === '') this.value = '';
+            this.value = this.options.find(item => item.name.toString().toLowerCase() === value).value;
         },
     },
 };
