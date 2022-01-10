@@ -8,13 +8,6 @@ export default {
     },
     triggerEvents: [{ name: 'change', label: { en: 'On change' }, event: { value: '' } }],
     properties: {
-        placeholder: {
-            label: { en: 'Placeholder', fr: 'Placeholder' },
-            type: 'Text',
-            options: { placeholder: 'Type text' },
-            multiLang: true,
-            section: 'settings',
-        },
         color: {
             label: { en: 'Color', fr: 'Couleur' },
             type: 'Color',
@@ -37,82 +30,80 @@ export default {
             },
             defaultValue: '15px',
         },
-        collection: {
-            label: {
-                en: 'Select from (unpaginated collection)',
-            },
-            type: 'Collection',
+        options: {
+            label: { en: 'Options', fr: 'Options' },
+            type: 'Info',
             options: {
-                paginated: false,
+                text: 'Bind options list',
             },
-            section: 'settings',
             bindable: true,
-            defaultValue: null,
+            defaultValue: [],
+            section: 'settings',
         },
-        isObjectsCollection: {
-            type: 'OnOff',
-            editorOnly: true,
-            hidden: true,
-            defaultValue: true,
-        },
-        displayBy: {
-            hidden: (content, sidepanelContent) => !content.collection || !sidepanelContent.isObjectsCollection,
+        displayField: {
+            hidden: (content, sidepanelContent, boundProps) =>
+                !boundProps.options || !content.options || (content.options && typeof content.options[0] !== 'object'),
             label: {
-                en: 'Display by',
-                fr: 'Display by',
+                en: 'Display field',
+                fr: 'Display field',
             },
             type: 'TextSelect',
-            options: content => {
-                let data = [];
-
-                if (typeof content.collection === 'string') {
-                    const collection = wwLib.wwCollection.getCollection(content.collection);
-                    if (collection && collection.data && collection.data.results) {
-                        data = collection.data.results.filter(item => !!item);
-                    }
-                } else {
-                    data = content.collection;
-                }
-
-                const options = content.itemsProperties
+            options: (content, sidepanelContent) => {
+                const data = content.options;
+                const options = sidepanelContent.itemsProperties
                     .map(item => {
-                        return data &&
-                            data[0] &&
-                            (typeof data[0][item] === 'string' || typeof data[0][item] === 'number')
+                        return data && (typeof data[0][item] === 'string' || typeof data[0][item] === 'number')
                             ? { value: item, label: { en: item } }
                             : null;
                     })
                     .filter(item => !!item);
 
                 return {
-                    options: [{ value: 'none', label: { en: 'Select a property' } }, ...options],
+                    options: [{ value: null, label: { en: 'Select a property' } }, ...options],
                 };
             },
-            defaultValue: 'none',
-            section: 'settings',
-        },
-        variableId: {
-            label: {
-                en: 'Associated variable',
-            },
-            type: 'Variable',
-            options: {
-                type: ['String', 'Query', 'Number'],
-            },
-            section: 'settings',
             defaultValue: null,
+            section: 'settings',
         },
-        initialValue: {
+        valueField: {
+            hidden: (content, sidepanelContent, boundProps) =>
+                !boundProps.options || !content.options || (content.options && typeof content.options[0] !== 'object'),
+            label: {
+                en: 'Value field',
+                fr: 'Value field',
+            },
+            type: 'TextSelect',
+            options: (content, sidepanelContent) => {
+                const options = sidepanelContent.itemsProperties
+                    .map(item => {
+                        return { value: item, label: { en: item } };
+                    })
+                    .filter(item => !!item);
+
+                return {
+                    options: [{ value: null, label: { en: 'Select a property' } }, ...options],
+                };
+            },
+            defaultValue: null,
+            section: 'settings',
+        },
+        value: {
             label: {
                 en: 'Initial value',
             },
             type: 'Text',
             section: 'settings',
-            hidden: content => content.variableId,
             bindable: true,
-            defaultValue: '',
+        },
+        placeholder: {
+            label: { en: 'Placeholder', fr: 'Placeholder' },
+            type: 'Text',
+            options: { placeholder: 'Type text' },
+            multiLang: true,
+            section: 'settings',
         },
         itemsProperties: {
+            editorOnly: true,
             hidden: true,
             defaultValue: [],
         },
