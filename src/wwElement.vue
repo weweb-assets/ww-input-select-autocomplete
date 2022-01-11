@@ -4,9 +4,10 @@
             id="autocomplete-choice"
             ref="input"
             list="autocomplete-list"
+            :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
-            @input="handleChange"
+            @input="handleManualInput($event.target.value)"
         />
 
         <datalist id="autocomplete-list">
@@ -27,7 +28,11 @@ export default {
     },
     emits: ['update:content:effect', 'trigger-event', 'update:sidepanel-content'],
     setup(props) {
-        const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable(props.uid, 'value', '');
+        const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable(
+            props.uid,
+            'value',
+            props.content.value === undefined ? '' : props.content.value
+        );
         return { variableValue, setValue };
     },
     computed: {
@@ -38,16 +43,8 @@ export default {
             // eslint-disable-next-line no-unreachable
             return false;
         },
-        value: {
-            get() {
-                return this.variableValue;
-            },
-            set(value) {
-                if (value !== undefined && value !== this.variableValue) {
-                    this.$emit('trigger-event', { name: 'change', event: { value } });
-                    this.setValue(value);
-                }
-            },
+        value() {
+            return `${this.variableValue}`;
         },
         cssVariables() {
             return {
@@ -103,25 +100,28 @@ export default {
         'wwEditorState.boundProps.options'(isBind) {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
-        'content.value'(value) {
-            this.value = value;
-            if (!this.options) return;
-            this.$refs.input.value = this.options.find(
-                item => item.value.toString().toLowerCase() === value.toString().toLowerCase()
-            ).name;
+        'content.value'(newValue, OldValue) {
+            if (newValue === OldValue) return;
+            this.setValue(newValue);
+            this.$emit('trigger-event', { name: 'initValueChange', event: { value: newValue } });
         },
         /* wwEditor:end */
     },
     methods: {
-        handleChange(event) {
+        handleManualInput(value) {
+            if (value === this.value) return;
             if (!this.options) return;
-            const value = event.target.value.toLowerCase();
+            value = value.toLowerCase();
             if (value === '') {
-                this.value = '';
+                this.setValue('');
+                this.$emit('trigger-event', { name: 'change', event: { value } });
                 return;
             }
-
-            this.value = this.options.find(item => item.name.toString().toLowerCase() === value).value;
+            const match = this.options.find(item => item.name.toString().toLowerCase() === value);
+            if (match && match.value) {
+                this.setValue(match.value);
+                this.$emit('trigger-event', { name: 'change', event: { value: match.value } });
+            }
         },
     },
 };
