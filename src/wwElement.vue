@@ -100,10 +100,20 @@ export default {
         'wwEditorState.boundProps.options'(isBind) {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
-        'content.value'(newValue, OldValue) {
-            if (newValue === OldValue) return;
-            this.setValue(newValue);
-            this.$emit('trigger-event', { name: 'initValueChange', event: { value: newValue } });
+        'content.value'(newValue) {
+            newValue = `${newValue}`;
+            if (newValue === this.value) return;
+            newValue = newValue.toLowerCase();
+            if (newValue === '') {
+                this.setValue('');
+                this.$emit('trigger-event', { name: 'initValueChange', event: { value: newValue } });
+                return;
+            }
+            const match = this.options.find(item => item.name.toString().toLowerCase() === newValue);
+            if (match && match.value) {
+                this.setValue(match.value);
+                this.$emit('trigger-event', { name: 'initValueChange', event: { value: match.value } });
+            }
         },
         /* wwEditor:end */
     },
