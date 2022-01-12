@@ -121,13 +121,18 @@ export default {
         handleManualInput(value) {
             if (value === this.value) return;
             if (!this.options) return;
-            value = value.toLowerCase();
             if (value === '') {
                 this.setValue('');
                 this.$emit('trigger-event', { name: 'change', event: { value } });
                 return;
             }
-            const match = this.options.find(item => item.name.toString().toLowerCase() === value);
+
+            const flatValue = `${value}`.toLowerCase();
+            const match = this.options.find(item => {
+                const value = `${item.name}`.toLowerCase();
+                return value === flatValue;
+            });
+
             if (match && match.value) {
                 this.setValue(match.value);
                 this.$emit('trigger-event', { name: 'change', event: { value: match.value } });
