@@ -101,15 +101,20 @@ export default {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
         'content.value'(newValue) {
-            newValue = `${newValue}`;
-            if (newValue === this.value) return;
-            newValue = newValue.toLowerCase();
-            if (newValue === '') {
+            if (!this.options) return;
+            const flatValue = `${newValue}`.toLowerCase();
+            if (flatValue === `${this.value}`.toLowerCase()) return;
+            if (flatValue === '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: 'initValueChange', event: { value: newValue } });
+                this.$emit('trigger-event', { name: 'initValueChange', event: { value: '' } });
                 return;
             }
-            const match = this.options.find(item => item.name.toString().toLowerCase() === newValue);
+
+            const match = this.options.find(item => {
+                const value = `${item.name}`.toLowerCase();
+                return value === flatValue;
+            });
+
             if (match && match.value) {
                 this.setValue(match.value);
                 this.$emit('trigger-event', { name: 'initValueChange', event: { value: match.value } });
@@ -119,15 +124,15 @@ export default {
     },
     methods: {
         handleManualInput(value) {
-            if (value === this.value) return;
             if (!this.options) return;
-            if (value === '') {
+            const flatValue = `${value}`.toLowerCase();
+            if (flatValue === `${this.value}`.toLowerCase()) return;
+            if (flatValue === '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: 'change', event: { value } });
+                this.$emit('trigger-event', { name: 'change', event: { value: '' } });
                 return;
             }
 
-            const flatValue = `${value}`.toLowerCase();
             const match = this.options.find(item => {
                 const value = `${item.name}`.toLowerCase();
                 return value === flatValue;
