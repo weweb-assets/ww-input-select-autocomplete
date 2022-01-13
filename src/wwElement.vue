@@ -3,15 +3,14 @@
         <input
             id="autocomplete-choice"
             ref="input"
-            list="autocomplete-list"
+            :list="datalistId"
             :value="value"
             :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
             @input="handleManualInput($event.target.value)"
         />
-
-        <datalist id="autocomplete-list">
+        <datalist :id="datalistId">
             <option v-for="(option, index) in options" :key="index" :value="option.name"></option>
         </datalist>
     </div>
@@ -34,7 +33,7 @@ export default {
             'value',
             props.content.value === undefined ? '' : props.content.value
         );
-        return { variableValue, setValue };
+        return { variableValue, setValue, datalistId: `autocomplete-list-${wwLib.wwUtils.getUid()}` };
     },
     computed: {
         isEditing() {
