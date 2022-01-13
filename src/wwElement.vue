@@ -4,6 +4,7 @@
             id="autocomplete-choice"
             ref="input"
             list="autocomplete-list"
+            :value="value"
             :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
@@ -103,8 +104,7 @@ export default {
         'content.value'(newValue) {
             if (!this.options) return;
             const flatValue = `${newValue}`.toLowerCase();
-            if (flatValue === `${this.value}`.toLowerCase()) return;
-            if (flatValue === '') {
+            if (flatValue === '' && this.value !== '') {
                 this.setValue('');
                 this.$emit('trigger-event', { name: 'initValueChange', event: { value: '' } });
                 return;
@@ -115,7 +115,7 @@ export default {
                 return value === flatValue;
             });
 
-            if (match && match.value) {
+            if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
                 this.$emit('trigger-event', { name: 'initValueChange', event: { value: match.value } });
             }
@@ -126,8 +126,7 @@ export default {
         handleManualInput(value) {
             if (!this.options) return;
             const flatValue = `${value}`.toLowerCase();
-            if (flatValue === `${this.value}`.toLowerCase()) return;
-            if (flatValue === '') {
+            if (flatValue === '' && this.value !== '') {
                 this.setValue('');
                 this.$emit('trigger-event', { name: 'change', event: { value: '' } });
                 return;
@@ -138,7 +137,7 @@ export default {
                 return value === flatValue;
             });
 
-            if (match && match.value) {
+            if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
                 this.$emit('trigger-event', { name: 'change', event: { value: match.value } });
             }
