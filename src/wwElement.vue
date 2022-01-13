@@ -117,6 +117,9 @@ export default {
             if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
                 this.$emit('trigger-event', { name: 'initValueChange', event: { value: match.value } });
+            } else if (this.value !== '') {
+                this.setValue('');
+                this.$emit('trigger-event', { name: 'initValueChange', event: { value: '' } });
             }
         },
         /* wwEditor:end */
@@ -139,6 +142,9 @@ export default {
             if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
                 this.$emit('trigger-event', { name: 'change', event: { value: match.value } });
+            } else if (this.value !== '') {
+                this.setValue('');
+                this.$emit('trigger-event', { name: 'change', event: { value: '' } });
             }
         },
     },
