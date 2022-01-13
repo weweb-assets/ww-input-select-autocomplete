@@ -116,26 +116,29 @@ export default {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
         'content.value'(newValue) {
-            this.changeValue(newValue, 'initValueChange');
+            this.changeValue(newValue, 'initValueChange', 'value');
         },
         /* wwEditor:end */
     },
     methods: {
         handleManualInput(value) {
-            this.changeValue(value, 'change');
+            this.changeValue(value, 'change', 'name');
         },
-        changeValue(value, trigger) {
+        changeValue(value, trigger, checkingProperty) {
             if (!this.options) return;
-            const flatValue = `${value}`.toLowerCase();
-            if (flatValue === '' && this.value !== '') {
+
+            if (value === '' && this.value !== '') {
                 this.setValue('');
                 this.$emit('trigger-event', { name: trigger, event: { value: '' } });
                 return;
             }
 
             const match = this.options.find(item => {
-                const value = `${item.name}`.toLowerCase();
-                return value === flatValue;
+                if (checkingProperty === 'name') {
+                    return `${item.name}`.toLowerCase() === `${value}`.toLowerCase();
+                } else {
+                    return item.value === value;
+                }
             });
 
             if (match && match.value && match.value !== this.value) {
