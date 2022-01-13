@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue';
 export default {
     props: {
         /* wwEditor:start */
@@ -33,7 +34,40 @@ export default {
             'value',
             props.content.value === undefined ? '' : props.content.value
         );
-        return { variableValue, setValue, datalistId: `autocomplete-list-${wwLib.wwUtils.getUid()}` };
+        const options = computed(() => {
+            if (!props.content.options) return;
+            let data = props.content.options;
+            if (data && !Array.isArray(data) && typeof data === 'object') {
+                data = new Array(data);
+            } else if ((data && !Array.isArray(data)) || typeof data !== 'object') {
+                return [];
+            }
+
+            return data
+                .filter(item => !!item)
+                .map(item => {
+                    if (typeof item !== 'object') return { name: item, value: item };
+                    return {
+                        name: wwLib.wwLang.getText(item[props.content.displayField || 'name'] || ''),
+                        value: item[props.content.valueField || 'value'],
+                    };
+                });
+        });
+
+        let label = '';
+        if (variableValue) {
+            const match = options.value.find(item => {
+                return item.value === variableValue.value;
+            });
+            if (match) label = match.name;
+        }
+        return {
+            variableValue,
+            setValue,
+            datalistId: `autocomplete-list-${wwLib.wwUtils.getUid()}`,
+            label: ref(label),
+            options,
+        };
     },
     computed: {
         isEditing() {
@@ -52,31 +86,6 @@ export default {
                 '--input-fontFamily': this.content.fontFamily,
                 '--input-fontSize': this.content.fontSize,
             };
-        },
-        options() {
-            if (!this.content.options) return;
-            let data = this.content.options;
-            if (data && !Array.isArray(data) && typeof data === 'object') {
-                data = new Array(data);
-            } else if ((data && !Array.isArray(data)) || typeof data !== 'object') {
-                return [];
-            }
-
-            return data
-                .filter(item => !!item)
-                .map(item => {
-                    if (typeof item !== 'object') return { name: item, value: item };
-                    return {
-                        name: wwLib.wwLang.getText(item[this.content.displayField || 'name'] || ''),
-                        value: item[this.content.valueField || 'value'],
-                    };
-                });
-        },
-        label() {
-            const match = this.options.find(item => {
-                return item.value === this.value;
-            });
-            return match && match.name;
         },
     },
     watch: {
@@ -107,36 +116,20 @@ export default {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
         'content.value'(newValue) {
-            if (!this.options) return;
-            const flatValue = `${newValue}`.toLowerCase();
-            if (flatValue === '' && this.value !== '') {
-                this.setValue('');
-                this.$emit('trigger-event', { name: 'initValueChange', event: { value: '' } });
-                return;
-            }
-
-            const match = this.options.find(item => {
-                const value = `${item.name}`.toLowerCase();
-                return value === flatValue;
-            });
-
-            if (match && match.value && match.value !== this.value) {
-                this.setValue(match.value);
-                this.$emit('trigger-event', { name: 'initValueChange', event: { value: match.value } });
-            } else if (this.value !== '') {
-                this.setValue('');
-                this.$emit('trigger-event', { name: 'initValueChange', event: { value: '' } });
-            }
+            this.changeValue(newValue, 'initValueChange');
         },
         /* wwEditor:end */
     },
     methods: {
         handleManualInput(value) {
+            this.changeValue(value, 'change');
+        },
+        changeValue(value, trigger) {
             if (!this.options) return;
             const flatValue = `${value}`.toLowerCase();
             if (flatValue === '' && this.value !== '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: 'change', event: { value: '' } });
+                this.$emit('trigger-event', { name: trigger, event: { value: '' } });
                 return;
             }
 
@@ -147,10 +140,11 @@ export default {
 
             if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
-                this.$emit('trigger-event', { name: 'change', event: { value: match.value } });
+                this.label = match.name;
+                this.$emit('trigger-event', { name: trigger, event: { value: match.value } });
             } else if (this.value !== '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: 'change', event: { value: '' } });
+                this.$emit('trigger-event', { name: trigger, event: { value: '' } });
             }
         },
     },
