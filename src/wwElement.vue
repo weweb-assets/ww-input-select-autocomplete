@@ -4,7 +4,7 @@
             id="autocomplete-choice"
             ref="input"
             :list="datalistId"
-            :value="value"
+            :value="label"
             :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
@@ -71,6 +71,12 @@ export default {
                         value: item[this.content.valueField || 'value'],
                     };
                 });
+        },
+        label() {
+            const match = this.options.find(item => {
+                return item.value === this.value;
+            });
+            return match && match.name;
         },
     },
     watch: {
