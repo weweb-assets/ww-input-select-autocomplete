@@ -115,10 +115,10 @@ export default {
         'wwEditorState.boundProps.options'(isBind) {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
+        /* wwEditor:end */
         'content.value'(newValue) {
             this.changeValue(newValue, 'initValueChange', 'value');
         },
-        /* wwEditor:end */
     },
     methods: {
         handleManualInput(value) {
