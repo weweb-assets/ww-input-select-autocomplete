@@ -9,6 +9,7 @@
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
             @input="handleManualInput($event.target.value)"
+            @blur="onBlur"
         />
         <datalist :id="datalistId">
             <option v-for="(option, index) in options" :key="index" :value="option.name"></option>
@@ -150,6 +151,15 @@ export default {
                 this.setValue('');
                 this.$emit('trigger-event', { name: trigger, event: { value: '' } });
             }
+        },
+        onBlur() {
+            /* wwEditor:start */
+            if (this.isEditing) return;
+            /* wwEditor:end */
+            const match = this.options.find(item => {
+                return item.value === this.variableValue;
+            });
+            if (match) this.label = match.name;
         },
     },
 };
