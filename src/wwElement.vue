@@ -122,6 +122,7 @@ export default {
     },
     methods: {
         handleManualInput(value) {
+            this.label = value;
             this.changeValue(value, 'change', 'name');
         },
         changeValue(value, trigger, checkingProperty) {
