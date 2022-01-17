@@ -159,7 +159,7 @@ export default {
             const match = this.options.find(item => {
                 return item.value === this.variableValue;
             });
-            if (match) this.label = match.name;
+            this.label = match ? match.name : '';
         },
     },
 };
