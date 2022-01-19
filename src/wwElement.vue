@@ -36,7 +36,7 @@ export default {
             props.content.value === undefined ? '' : props.content.value
         );
         const options = computed(() => {
-            if (!props.content.options) return;
+            if (!props.content.options) return [];
             let data = props.content.options;
             if (data && !Array.isArray(data) && typeof data === 'object') {
                 data = new Array(data);
@@ -105,14 +105,14 @@ export default {
                 }
             },
         },
-        'wwEditorState.sidepanelContent.itemsProperties'(newProperties, oldProperties) {
-            if (_.isEqual(newProperties, oldProperties)) return;
-            if (this.wwEditorState.boundProps.options && newProperties && newProperties[0]) {
-                this.$emit('update:content:effect', { displayField: newProperties[0], valueField: newProperties[0] });
-            } else {
-                this.$emit('update:content:effect', { displayField: null, valueField: null });
-            }
-        },
+        // 'wwEditorState.sidepanelContent.itemsProperties'(newProperties, oldProperties) {
+        //     if (_.isEqual(newProperties, oldProperties)) return;
+        //     if (this.wwEditorState.boundProps.options && newProperties && newProperties[0]) {
+        //         this.$emit('update:content:effect', { displayField: newProperties[0], valueField: newProperties[0] });
+        //     } else {
+        //         this.$emit('update:content:effect', { displayField: null, valueField: null });
+        //     }
+        // },
         'wwEditorState.boundProps.options'(isBind) {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
