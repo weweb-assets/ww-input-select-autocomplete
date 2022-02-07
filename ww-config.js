@@ -104,6 +104,7 @@ export default {
             options: { placeholder: 'Type text' },
             multiLang: true,
             section: 'settings',
+            bindable: true,
         },
         itemsProperties: {
             editorOnly: true,
