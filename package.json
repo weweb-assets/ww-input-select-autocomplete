@@ -3,7 +3,7 @@
     "repository": {
         "url": "https://github.com/weweb-assets/ww-webapp-autocomplete"
     },
-    "version": "3.3.2",
+    "version": "3.3.3",
     "license": "MIT",
     "scripts": {
         "build": "weweb build",
