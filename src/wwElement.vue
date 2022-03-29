@@ -30,11 +30,12 @@ export default {
     },
     emits: ['update:content:effect', 'trigger-event', 'update:sidepanel-content'],
     setup(props) {
-        const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable(
-            props.uid,
-            'value',
-            props.content.value === undefined ? '' : props.content.value
-        );
+        const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable({
+            uid: props.uid,
+            name: 'value',
+            type: 'string',
+            defaultValue: props.content.value === undefined ? '' : props.content.value
+        });
         const options = computed(() => {
             if (!props.content.options) return [];
             let data = props.content.options;
