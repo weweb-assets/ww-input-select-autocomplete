@@ -9,7 +9,7 @@
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
             @input="handleManualInput($event.target.value)"
-            @blur="onBlur"
+            @blur="setMatchingLabel"
         />
         <datalist :id="datalistId">
             <option v-for="(option, index) in options" :key="index" :value="option.name"></option>
@@ -33,7 +33,6 @@ export default {
         const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable({
             uid: props.uid,
             name: 'value',
-            type: 'string',
             defaultValue: props.content.value === undefined ? '' : props.content.value
         });
         const options = computed(() => {
@@ -49,20 +48,16 @@ export default {
                 .filter(item => !!item)
                 .map(item => {
                     if (typeof item !== 'object') return { name: item, value: item };
+                    const labelField = props.content.displayField || 'name';
+                    const valueField = props.content.valueField || 'value';
                     return {
-                        name: wwLib.wwLang.getText(item[props.content.displayField || 'name'] || ''),
-                        value: item[props.content.valueField || 'value'],
+                        name: wwLib.wwLang.getText(wwLib.resolveObjectPropertyPath(item, labelField) || ''),
+                        value: wwLib.resolveObjectPropertyPath(item, valueField),
                     };
                 });
         });
 
         let label = '';
-        if (variableValue) {
-            const match = options.value.find(item => {
-                return item.value === variableValue.value;
-            });
-            if (match) label = match.name;
-        }
         return {
             variableValue,
             setValue,
@@ -80,7 +75,7 @@ export default {
             return false;
         },
         value() {
-            return `${this.variableValue}`;
+            return this.variableValue;
         },
         cssVariables() {
             return {
@@ -91,6 +86,12 @@ export default {
         },
     },
     watch: {
+        value: {
+            immediate: true,
+            handler: function () {
+                this.setMatchingLabel()
+            }
+        },
         /* wwEditor:start */
         'content.options': {
             immediate: true,
@@ -153,13 +154,11 @@ export default {
                 this.$emit('trigger-event', { name: trigger, event: { value: '' } });
             }
         },
-        onBlur() {
+        setMatchingLabel() {
             /* wwEditor:start */
             if (this.isEditing) return;
             /* wwEditor:end */
-            const match = this.options.find(item => {
-                return item.value === this.variableValue;
-            });
+            const match = this.options.find(item => item.value === this.variableValue);
             this.label = match ? match.name : '';
         },
     },
