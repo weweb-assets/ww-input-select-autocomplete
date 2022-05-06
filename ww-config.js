@@ -95,6 +95,12 @@ export default {
             section: 'settings',
             bindable: true,
         },
+        required: {
+            label: 'Required',
+            type: 'OnOff',
+            section: 'settings',
+            defaultValue: true,
+        },
         itemsProperties: {
             editorOnly: true,
             hidden: true,
