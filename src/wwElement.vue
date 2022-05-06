@@ -10,6 +10,7 @@
             :placeholder="wwLang.getText(content.placeholder)"
             @input="handleManualInput($event.target.value)"
             @blur="setMatchingLabel"
+            :required="content.required"
         />
         <datalist :id="datalistId">
             <option v-for="(option, index) in options" :key="index" :value="option.name"></option>
