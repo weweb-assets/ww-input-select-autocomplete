@@ -8,7 +8,7 @@
             :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
-            @input="handleManualInput($event.target.value)"
+            @input="handleManualInput($event)"
             @blur="setMatchingLabel"
             :required="content.required"
         />
@@ -125,16 +125,17 @@ export default {
         },
     },
     methods: {
-        handleManualInput(value) {
+        handleManualInput(event) {
+            const value = event.target.value;
             this.label = value;
-            this.changeValue(value, 'change', 'name');
+            this.changeValue(value, 'change', 'name', event);
         },
-        changeValue(value, trigger, checkingProperty) {
+        changeValue(value, trigger, checkingProperty, event) {
             if (!this.options) return;
 
             if (value === '' && this.value !== '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: trigger, event: { value: '' } });
+                this.$emit('trigger-event', { name: trigger, event: { domEvent: event ||{}, value: '' } });
                 return;
             }
 
@@ -149,10 +150,10 @@ export default {
             if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
                 this.label = match.name;
-                this.$emit('trigger-event', { name: trigger, event: { value: match.value } });
+                this.$emit('trigger-event', { name: trigger, event: { domEvent: event ||{}, value: match.value } });
             } else if (this.value !== '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: trigger, event: { value: '' } });
+                this.$emit('trigger-event', { name: trigger, event: { domEvent: event ||{}, value: '' } });
             }
         },
         setMatchingLabel() {
