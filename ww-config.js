@@ -8,6 +8,7 @@ export default {
     },
     triggerEvents: [
         { name: 'change', label: { en: 'On change' }, event: { value: '' } },
+        { name: 'search', label: { en: 'On search' }, event: { value: '' } },
         { name: 'initValueChange', label: { en: 'On init value change' }, event: { value: '' } },
     ],
     properties: {
