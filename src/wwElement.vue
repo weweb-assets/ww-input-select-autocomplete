@@ -29,7 +29,7 @@ export default {
         uid: { type: String, required: true },
         wwElementState: { type: Object, required: true },
     },
-    emits: ['update:content:effect', 'trigger-event', 'update:sidepanel-content'],
+    emits: ['update:content:effect', 'trigger-event'],
     setup(props) {
         const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable({
             uid: props.uid,
@@ -94,28 +94,6 @@ export default {
             }
         },
         /* wwEditor:start */
-        'content.options': {
-            immediate: true,
-            handler(options) {
-                const objectOptions = (options || []).filter(option => option && typeof option === 'object');
-                if (objectOptions[0]) {
-                    this.$emit('update:sidepanel-content', {
-                        path: 'itemsProperties',
-                        value: Object.keys(objectOptions[0]),
-                    });
-                } else {
-                    this.$emit('update:sidepanel-content', { path: 'itemsProperties', value: [] });
-                }
-            },
-        },
-        // 'wwEditorState.sidepanelContent.itemsProperties'(newProperties, oldProperties) {
-        //     if (_.isEqual(newProperties, oldProperties)) return;
-        //     if (this.wwEditorState.boundProps.options && newProperties && newProperties[0]) {
-        //         this.$emit('update:content:effect', { displayField: newProperties[0], valueField: newProperties[0] });
-        //     } else {
-        //         this.$emit('update:content:effect', { displayField: null, valueField: null });
-        //     }
-        // },
         'wwEditorState.boundProps.options'(isBind) {
             if (!isBind) this.$emit('update:content:effect', { displayField: null, valueField: null });
         },
@@ -157,9 +135,6 @@ export default {
             }
         },
         setMatchingLabel() {
-            /* wwEditor:start */
-            if (this.isEditing) return;
-            /* wwEditor:end */
             const match = this.options.find(item => item.value === this.variableValue);
             this.label = match ? match.name : '';
         },
