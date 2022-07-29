@@ -8,9 +8,9 @@
             :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
+            :required="content.required"
             @input="handleManualInput($event)"
             @blur="setMatchingLabel"
-            :required="content.required"
         />
         <datalist :id="datalistId">
             <option v-for="(option, index) in options" :key="index" :value="option.name"></option>
@@ -34,7 +34,7 @@ export default {
         const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable({
             uid: props.uid,
             name: 'value',
-            defaultValue: props.content.value === undefined ? '' : props.content.value
+            defaultValue: props.content.value === undefined ? '' : props.content.value,
         });
         const options = computed(() => {
             if (!props.content.options) return [];
@@ -90,8 +90,8 @@ export default {
         value: {
             immediate: true,
             handler: function () {
-                this.setMatchingLabel()
-            }
+                this.setMatchingLabel();
+            },
         },
         /* wwEditor:start */
         'wwEditorState.boundProps.options'(isBind) {
@@ -107,13 +107,19 @@ export default {
             const value = event.target.value;
             this.label = value;
             this.changeValue(value, 'change', 'name', event);
+            if (this.delayedSearch) {
+                clearTimeout(this.delayedSearch);
+            }
+            this.delayedSearch = setTimeout(() => {
+                this.$emit('trigger-event', { name: 'search', event: { domEvent: event || {}, value } });
+            }, 300);
         },
         changeValue(value, trigger, checkingProperty, event) {
             if (!this.options) return;
 
             if (value === '' && this.value !== '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: trigger, event: { domEvent: event ||{}, value: '' } });
+                this.$emit('trigger-event', { name: trigger, event: { domEvent: event || {}, value: '' } });
                 return;
             }
 
@@ -128,10 +134,10 @@ export default {
             if (match && match.value && match.value !== this.value) {
                 this.setValue(match.value);
                 this.label = match.name;
-                this.$emit('trigger-event', { name: trigger, event: { domEvent: event ||{}, value: match.value } });
+                this.$emit('trigger-event', { name: trigger, event: { domEvent: event || {}, value: match.value } });
             } else if (this.value !== '') {
                 this.setValue('');
-                this.$emit('trigger-event', { name: trigger, event: { domEvent: event ||{}, value: '' } });
+                this.$emit('trigger-event', { name: trigger, event: { domEvent: event || {}, value: '' } });
             }
         },
         setMatchingLabel() {
