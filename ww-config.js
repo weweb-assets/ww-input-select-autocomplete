@@ -7,7 +7,7 @@ export default {
         icon: 'fontawesome/solid/search',
     },
     triggerEvents: [
-        { name: 'change', label: { en: 'On change' }, event: { value: '' } },
+        { name: 'change', label: { en: 'On change' }, event: { value: '' }, default: true },
         { name: 'search', label: { en: 'On search' }, event: { value: '' } },
         { name: 'initValueChange', label: { en: 'On init value change' }, event: { value: '' } },
     ],
