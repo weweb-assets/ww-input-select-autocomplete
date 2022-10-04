@@ -31,6 +31,8 @@ export default {
     },
     emits: ['update:content:effect', 'trigger-event'],
     setup(props) {
+        const { resolveMappingFormula } = wwLib.wwFormula.useFormula();
+
         const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable({
             uid: props.uid,
             name: 'value',
@@ -49,11 +51,11 @@ export default {
                 .filter(item => !!item)
                 .map(item => {
                     if (typeof item !== 'object') return { name: item, value: item };
-                    const labelField = props.content.displayField || 'name';
-                    const valueField = props.content.valueField || 'value';
                     return {
-                        name: wwLib.wwLang.getText(wwLib.resolveObjectPropertyPath(item, labelField) || ''),
-                        value: wwLib.resolveObjectPropertyPath(item, valueField),
+                        name: wwLib.wwLang.getText(
+                            resolveMappingFormula(this.content.displayField, item, item.name || '')
+                        ),
+                        value: resolveMappingFormula(this.content.valueField, item, item.value || ''),
                     };
                 });
         });

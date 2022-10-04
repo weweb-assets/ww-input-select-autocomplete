@@ -45,38 +45,24 @@ export default {
             section: 'settings',
         },
         displayField: {
-            hidden: (content, sidepanelContent, boundProps) =>
-                !boundProps.options || !content.options || (content.options && typeof content.options[0] !== 'object'),
+            hidden: (content, sidepanelContent, boundProps) => !boundProps.options || !content.options,
             label: {
-                en: 'Display field',
-                fr: 'Display field',
+                en: 'Option label',
+                fr: 'Option label',
             },
-            type: 'ObjectPropertyPath',
-            options: content => {
-                if (!content.options.length || typeof content.options[0] !== 'object') {
-                    return null;
-                }
-
-                return { object: content.options[0] };
-            },
+            type: 'Formula',
+            options: content => ({ template: content.options.length ? content.options[0] : null }),
             defaultValue: null,
             section: 'settings',
         },
         valueField: {
-            hidden: (content, sidepanelContent, boundProps) =>
-                !boundProps.options || !content.options || (content.options && typeof content.options[0] !== 'object'),
+            hidden: (content, sidepanelContent, boundProps) => !boundProps.options || !content.options,
             label: {
-                en: 'Value field',
-                fr: 'Value field',
+                en: 'Option value',
+                fr: 'Option value',
             },
-            type: 'ObjectPropertyPath',
-            options: content => {
-                if (!content.options.length || typeof content.options[0] !== 'object') {
-                    return null;
-                }
-
-                return { object: content.options[0] };
-            },
+            type: 'Formula',
+            options: content => ({ template: content.options.length ? content.options[0] : null }),
             defaultValue: null,
             section: 'settings',
         },
