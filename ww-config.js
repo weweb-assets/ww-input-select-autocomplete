@@ -43,6 +43,13 @@ export default {
             bindable: true,
             defaultValue: [],
             section: 'settings',
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'array',
+                tooltip:
+                    'A collection of data in array format: \n\n `[{}, {}, ...] || ["string1", "string2", ...] || [1, 2, ...]`',
+            },
+            /* wwEditor:end */
         },
         displayField: {
             hidden: (content, sidepanelContent, boundProps) =>
@@ -87,6 +94,12 @@ export default {
             type: 'Text',
             section: 'settings',
             bindable: true,
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'string',
+                tooltip: 'A string that defines if the input initial value: `"value"`',
+            },
+            /* wwEditor:end */
         },
         placeholder: {
             label: { en: 'Placeholder', fr: 'Placeholder' },
@@ -95,6 +108,12 @@ export default {
             multiLang: true,
             section: 'settings',
             bindable: true,
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'string',
+                tooltip: 'A string that defines if the input placeholder: `"placeholder"`',
+            },
+            /* wwEditor:end */
         },
         required: {
             label: 'Required',
@@ -102,6 +121,12 @@ export default {
             section: 'settings',
             defaultValue: true,
             bindable: true,
+            /* wwEditor:start */
+            bindingValidation: {
+                type: 'boolean',
+                tooltip: 'A boolean that defines if the input is required: `true | false`',
+            },
+            /* wwEditor:end */
         },
         itemsProperties: {
             editorOnly: true,
