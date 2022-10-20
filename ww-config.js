@@ -4,7 +4,7 @@ export default {
             en: 'Autocomplete select',
             fr: 'Autocomplete select',
         },
-        icon: 'fontawesome/solid/search',
+        icon: 'search',
     },
     triggerEvents: [
         { name: 'change', label: { en: 'On change' }, event: { value: '' }, default: true },
