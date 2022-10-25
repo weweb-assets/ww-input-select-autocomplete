@@ -1,5 +1,5 @@
 <template>
-    <div class="ww-webapp-autocomplete" :styles="cssVariables">
+    <div class="ww-webapp-autocomplete" :style="cssVariables">
         <input
             id="autocomplete-choice"
             ref="input"
