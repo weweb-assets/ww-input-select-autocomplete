@@ -4,7 +4,7 @@ export default {
             en: 'Autocomplete select',
             fr: 'Autocomplete select',
         },
-        icon: 'search',
+        icon: 'select',
     },
     triggerEvents: [
         { name: 'change', label: { en: 'On change' }, event: { value: '' }, default: true },
