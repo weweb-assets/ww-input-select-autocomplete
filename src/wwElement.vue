@@ -34,7 +34,7 @@ export default {
         const { value: variableValue, setValue } = wwLib.wwVariable.useComponentVariable({
             uid: props.uid,
             name: 'value',
-            defaultValue: props.content.value === undefined ? '' : props.content.value,
+            defaultValue: computed(() => props.content.value === undefined ? '' : props.content.value),
         });
         const options = computed(() => {
             if (!props.content.options) return [];
