@@ -15,12 +15,18 @@ export default {
         color: {
             label: { en: 'Color', fr: 'Couleur' },
             type: 'Color',
-            defaultValue: 'black',
+            classes: true,
+            responsive: true,
+            states: true,
+            bindable: true,
         },
         fontFamily: {
             type: 'FontFamily',
             label: { en: 'Font family', fr: 'Font' },
-            defaultValue: '',
+            classes: true,
+            responsive: true,
+            states: true,
+            bindable: true,
         },
         fontSize: {
             type: 'Length',
@@ -32,7 +38,10 @@ export default {
                     { value: 'rem', label: 'rem', min: 1, max: 50 },
                 ],
             },
-            defaultValue: '15px',
+            classes: true,
+            responsive: true,
+            states: true,
+            bindable: true,
         },
         options: {
             label: { en: 'Options', fr: 'Options' },
