@@ -1,11 +1,10 @@
 <template>
-    <div class="ww-webapp-autocomplete" :style="cssVariables">
+    <div class="ww-webapp-autocomplete" :style="cssVariables" :class="{ editing: isEditing }">
         <input
             id="autocomplete-choice"
             ref="input"
             :list="datalistId"
             :value="label"
-            :class="{ editing: isEditing }"
             :name="wwElementState.name"
             :placeholder="wwLang.getText(content.placeholder)"
             :required="content.required"
@@ -150,22 +149,22 @@ export default {
 
 <style lang="scss" scoped>
 .ww-webapp-autocomplete {
+    position: relative;
+    /* wwEditor:start */
+    &.editing::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+    /* wwEditor:end */
     #autocomplete-choice {
         outline: none;
-        width: inherit;
-        height: inherit;
-        min-height: inherit;
         border: none;
         background-color: inherit;
         font-family: var(--input-fontFamily);
         color: var(--input-color);
         font-size: var(--input-fontSize);
-
-        /* wwEditor:start */
-        &.editing {
-            pointer-events: none;
-        }
-        /* wwEditor:end */
     }
 }
 </style>

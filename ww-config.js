@@ -6,6 +6,9 @@ export default {
         },
         icon: 'select',
     },
+    options: {
+        displayAllowedValues: ['flex', 'inline-flex'],
+    },
     triggerEvents: [
         { name: 'change', label: { en: 'On change' }, event: { value: '' }, default: true },
         { name: 'search', label: { en: 'On search' }, event: { value: '' } },
