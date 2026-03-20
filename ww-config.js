@@ -10,9 +10,9 @@ export default {
         displayAllowedValues: ['flex', 'inline-flex'],
     },
     triggerEvents: [
-        { name: 'change', label: { en: 'On change' }, event: { value: '' }, default: true },
-        { name: 'search', label: { en: 'On search' }, event: { value: '' } },
-        { name: 'initValueChange', label: { en: 'On init value change' }, event: { value: '' } },
+        { name: 'change', label: { en: 'On change' }, event: { value: '' }, default: true, description: "Run when the value changes." },
+        { name: 'search', label: { en: 'On search' }, event: { value: '' }, description: "Run when the user performs a search." },
+        { name: 'initValueChange', label: { en: 'On init value change' }, event: { value: '' }, description: "Run when the initial value changes." },
     ],
     properties: {
         color: {
